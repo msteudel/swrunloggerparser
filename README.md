@@ -1,0 +1,2 @@
+# swrunloggerparser
+Parses RunLogger output
