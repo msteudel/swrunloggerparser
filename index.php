@@ -1,8 +1,4 @@
 <?php
-
-$inputFile = dirname(__FILE__) . '/HoboMiles-7149775-runs.csv';
-$outputFile = dirname(__FILE__) . '/teamData.csv';
-
 $tm = [
     'date' => 0,
     'dungeon' => 1,
@@ -142,11 +138,17 @@ function cleanup($file) {
 }
 
 function createTable($data) {
-    $html = '<table class="table table-striped">';
-    $html .= '<thead><th>Team Name</th><th>Number of Runs</th><th>Average Time</th><th>Average Win Rate</th></thead>';
+    $html = '';
     if(is_array($data)) {
         foreach($data as $dungeon => $runData ) {
-            $html .= '<tr><td colspan="4"><h3>' . $dungeon . '</h3></td>';
+            $html .= '<h3>' . $dungeon . '</h3>';
+            $html .= '<table class="table table-striped" data-toggle="table"  data-sort-name="numRuns" data-sort-order="desc">';
+            $html .= '<thead><th data-field="team" data-sortable="true">Team Name</th>
+                        <th data-field="numRuns" data-sortable="true">Number of Runs</th>
+                        <th data-field="avgTime" data-sortable="true">Average Time</th>
+                        <th data-field="winRate" data-sortable="true">Average Win Rate</th>
+                        </thead>';
+            $html .= '<tbody>';
             foreach($runData as $teamName => $teamData ) {
                 unset($teamData['win']);
                 unset($teamData['totalTime']);
@@ -157,16 +159,16 @@ function createTable($data) {
 
                 $html .= '</tr>';
             }
-
+            $html .= '</tbody>';
+            $html .= '</table>';
         }
     }
-    $html .= '</table>';
 
     return $html;
 }
 
 if(isset($_POST['submitForm'])) {
-    $uploaddir = '/home/mybestdungeonteams/mybestdungeonteams.mindfulinteractive.com/uploads/';
+    $uploaddir = dirname(__FILE__) . '/uploads/';
     $uploadfile = $uploaddir . microtime().'.csv';
 
     if (move_uploaded_file($_FILES['userFile']['tmp_name'], $uploadfile)) {
@@ -206,12 +208,19 @@ if(isset($_POST['submitForm'])) {
     <meta name="description" content="Dungeon Teams">
     <meta name="author" content="HoboMiles">
 
-    <link rel="stylesheet" href="css/styles.css?v=1.0">
-
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.min.css">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.min.js"></script>
+
+    <!-- Latest compiled and minified Locales -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/locale/bootstrap-table-zh-CN.min.js"></script>
 </head>
 
 <body>
