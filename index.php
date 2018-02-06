@@ -6,15 +6,20 @@ $tm = [
     'time' => 3,
 ];
 
-$validDungeon = [
-    'Necropolis B10',
+$validDungeons = [
     'Dragon\'s Lair B10',
-    'Giant\'s Keep B10'
+    'Giant\'s Keep B10',
+    'Necropolis B10',
+    'Hall of Magic B10',
+    'Hall of Dark B10',
+    'Hall of Water B10',
+    'Hall of Fire B10',
+    'Hall of Wind B10'
 ];
 
 
 function processData( $inputFile ) {
-    global $tm, $validDungeon;
+    global $tm, $validDungeons;
 
     $runData = [];
     $row = 1;
@@ -23,7 +28,7 @@ function processData( $inputFile ) {
             $num = count($data);
             $row++;
 
-            if(in_array($data[$tm['dungeon']], $validDungeon)) {
+            if(in_array($data[$tm['dungeon']], $validDungeons)) {
                 if( !is_array($runData[$data[$tm['dungeon']]][implode(',', sortTeam($data))])) {
                     $runData[$data[$tm['dungeon']]][implode(',', sortTeam($data))] = [
                         'win' => ($data[$tm['result']] == 'Win' ? 1 : 0),
@@ -79,10 +84,10 @@ function convertToMinutes($seconds) {
 }
 
 function writeToCsv($data) {
-    global $validDungeon, $outputFile;
+    global $validDungeons, $outputFile;
     $fp = fopen($outputFile, 'w');
     fputcsv($fp, ['Dungeon', 'Team', 'Total Runs', 'Avg Time', 'Avg Win' ]);
-    foreach($validDungeon as $dungeonName) {
+    foreach($validDungeons as $dungeonName) {
         foreach($data[$dungeonName] as $teamName => $team) {
             $line = [$dungeonName, $teamName];
 
@@ -94,7 +99,7 @@ function writeToCsv($data) {
 }
 
 function writeToBrowser($data) {
-    global $validDungeon, $outputFile;
+    global $validDungeons, $outputFile;
 
     // Open the output stream
     $fh = fopen('php://output', 'w');
@@ -103,7 +108,7 @@ function writeToBrowser($data) {
     ob_start();
     fputcsv($fh, ['Dungeon', 'Team', 'Total Runs', 'Avg Time', 'Avg Win' ]);
 
-    foreach($validDungeon as $dungeonName) {
+    foreach($validDungeons as $dungeonName) {
         foreach($data[$dungeonName] as $teamName => $team) {
             $line = [$dungeonName, $teamName];
 
@@ -137,11 +142,21 @@ function cleanup($file) {
     unlink($file);
 }
 
+function createNavLinks($dungeons ) {
+    $html = '<ul class="navbar-nav mr-auto">';
+    foreach( $dungeons as $dungeonName ) {
+        $html .= '<li class="nav-item">
+                    <a class="nav-link disabled" href="#' . $dungeonName . '">' . $dungeonName . '</a>
+                </li>';
+    }
+    $html .= '</ul>';
+    return $html;
+}
 function createTable($data) {
     $html = '';
     if(is_array($data)) {
         foreach($data as $dungeon => $runData ) {
-            $html .= '<h3>' . $dungeon . '</h3>';
+            $html .= '<a class="anchor" name="' . $dungeon . '"></a><h3>' . $dungeon . '</h3>';
             $html .= '<table class="table table-striped" data-toggle="table"  data-sort-name="numRuns" data-sort-order="desc">';
             $html .= '<thead><th data-field="team" data-sortable="true">Team Name</th>
                         <th data-field="numRuns" data-sortable="true">Number of Runs</th>
@@ -184,7 +199,7 @@ if(isset($_POST['submitForm'])) {
         $html = createTable($runData);
 
     } else {
-        echo "Possible file upload attack!\n";
+        $errorHtml = '<p class="bg-danger">No file chosen</p>';
     }
 }
 ?>
@@ -215,6 +230,7 @@ if(isset($_POST['submitForm'])) {
 
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.min.css">
+    <link rel="stylesheet" href="styles.css">
 
     <!-- Latest compiled and minified JavaScript -->
     <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.min.js"></script>
@@ -224,8 +240,29 @@ if(isset($_POST['submitForm'])) {
 </head>
 
 <body>
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+        <a class="navbar-brand" href="#top">Top</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+           <?php echo createNavLinks($validDungeons) ?>
+        </div>
+    </nav>
     <div class="container">
-        <p>Upload your csv file that is generated from <a href="https://github.com/Xzandro/sw-exporter">SWEX</a>. If you need help using SWEX, here's a <a href="https://www.youtube.com/watch?v=2xwtDalvwp0">youtube video</a> that explains how to use it.</p>
+        <a class="anchor" name="top"></a>
+
+        <h3>My Best Dungeon Teams</h3>
+        <p>Welcome to My Best Dungeon Teams. This site parses the output from the Run Logger plugin into tables
+            that allow you to see stats about your farming teams such as: number of runs, avg time, and sucess rate. </p>
+
+        <p>Upload your csv file that is generated from <a href="https://github.com/Xzandro/sw-exporter">SWEX</a>. If you
+            need help using SWEX, here's a <a href="https://www.youtube.com/watch?v=2xwtDalvwp0">youtube video</a> that explains how to use it.
+            If you run into any issues or have feature requests you can go here <a href="https://github.com/msteudel/swrunloggerparser/issues">here</a>. </p>
+
+        <p>Download a test file if you want to see how it works: <a href="testplayer-12345.csv">Click Here</a></p>
+
+        <?php echo isset($errorHtml) ? $errorHtml : '' ?>
         <!-- The data encoding type, enctype, MUST be specified as below -->
         <form enctype="multipart/form-data" action="index.php" method="POST">
             <!-- Name of input element determines name in $_FILES array -->
@@ -246,6 +283,7 @@ if(isset($_POST['submitForm'])) {
         </form>
 
         <?php echo $html ?>
+        <p></p>
     </div>
 
 </body>
