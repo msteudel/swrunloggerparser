@@ -8,3 +8,7 @@ a.anchor {
     top: -100px;
     visibility: hidden;
 }
+
+#downloadCsv {
+    width: 20px;
+}

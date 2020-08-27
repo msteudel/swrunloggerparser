@@ -7,14 +7,16 @@ $tm = [
 ];
 
 $validDungeons = [
-    'Dragon\'s Lair B10',
-    'Giant\'s Keep B10',
-    'Necropolis B10',
+    'Dragon\'s Lair B12',
+    'Giant\'s Keep B12',
+    'Necropolis B12',
+    'Punisher\'s Crypt B10',
+    'Steel Fortress B10',
     'Hall of Magic B10',
     'Hall of Dark B10',
     'Hall of Water B10',
     'Hall of Fire B10',
-    'Hall of Wind B10'
+    'Hall of Wind B10',
 ];
 
 
@@ -37,7 +39,7 @@ function processData( $inputFile ) {
                         'avgTime' => $data[$tm['time']]
                     ];
 
-                    $runData[$data[$tm['dungeon']]][implode(',', sortTeam($data))]['avgWin'] = ($runData[$data[$tm['dungeon']]][implode(',', sortTeam($data))]['win'] / $runData[$data[$tm['dungeon']]][implode(',', sortTeam($data))]['total']) * 100;
+                    $runData[$data[$tm['dungeon']]][implode(',', sortTeam($data))]['avgWin'] = ($runData[$data[$tm['dungeon']]][implode(',', sortTeam($data))]['win'] / $runData[$data[$tm['dungeon']]][implode(',', sortTeam($data))]['total']) * 100 . '%';
                 }
                 else {
                     $runData[$data[$tm['dungeon']]][implode(',', sortTeam($data))]['total']++;
@@ -68,7 +70,7 @@ function sortTeam($data) {
     sort($team);
 
     // put leader at front of array
-    array_unshift($team, $data['20']);
+    array_unshift($team, $data['20'] . ' (L)');
     return $team;
 }
 
@@ -193,7 +195,7 @@ if(isset($_POST['submitForm'])) {
         }
         if($_POST['downloadCsv']) {
             writeToBrowser($runData);
-            cleanup($uploadFile);
+            cleanup($uploadfile);
         }
 
         $html = createTable($runData);
@@ -252,13 +254,17 @@ if(isset($_POST['submitForm'])) {
     <div class="container">
         <a class="anchor" name="top"></a>
 
+
         <h3>My Best Dungeon Teams</h3>
+        <p>* August 26th, 2020 Update - Updated to support new dungeons.</p>
         <p>Welcome to My Best Dungeon Teams. This site parses the output from the Run Logger plugin into tables
             that allow you to see stats about your farming teams such as: number of runs, avg time, and sucess rate. </p>
 
         <p>Upload your csv file that is generated from <a href="https://github.com/Xzandro/sw-exporter">SWEX</a>. If you
             need help using SWEX, here's a <a href="https://www.youtube.com/watch?v=2xwtDalvwp0">youtube video</a> that explains how to use it.
             If you run into any issues or have feature requests you can go here <a href="https://github.com/msteudel/swrunloggerparser/issues">here</a>. </p>
+
+
 
         <p>Download a test file if you want to see how it works: <a href="testplayer-12345.csv">Click Here</a></p>
 
@@ -275,7 +281,7 @@ if(isset($_POST['submitForm'])) {
             </div>
 
             <div class="form-group">
-                <label for="downloadCsv">Download as CSV file: </label>
+                <label for="downloadCsv">Check the box to download results as CSV file: </label>
                 <input name="downloadCsv" id="downloadCsv" type="checkbox"  class="form-control-file"/>
             </div>
 
