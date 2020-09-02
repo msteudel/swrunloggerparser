@@ -47,7 +47,7 @@ function processData( $inputFile ) {
                     if($data[$tm['result']] == 'Win'){
                         $runData[$data[$tm['dungeon']]][implode(',', sortTeam($data))]['win']++;
                     }
-                    $runData[$data[$tm['dungeon']]][implode(',', sortTeam($data))]['avgWin'] = round(($runData[$data[$tm['dungeon']]][implode(',', sortTeam($data))]['win'] / $runData[$data[$tm['dungeon']]][implode(',', sortTeam($data))]['total']) * 100) . '%';
+                    $runData[$data[$tm['dungeon']]][implode(',', sortTeam($data))]['avgWin'] = round(($runData[$data[$tm['dungeon']]][implode(',', sortTeam($data))]['win'] / $runData[$data[$tm['dungeon']]][implode(',', sortTeam($data))]['total']) * 100, 2) . '%';
                     $runData[$data[$tm['dungeon']]][implode(',', sortTeam($data))]['avgTime'] = convertToMinutes($runData[$data[$tm['dungeon']]][implode(',', sortTeam($data))]['totalTime'] / $runData[$data[$tm['dungeon']]][implode(',', sortTeam($data))]['total']);
                 }
             }
@@ -256,6 +256,7 @@ if(isset($_POST['submitForm'])) {
 
 
         <h3>My Best Dungeon Teams</h3>
+        <p>* Sept 2nd, 2020 Update - Avg win rate now goes out two decimal places.</p>
         <p>* August 26th, 2020 Update - Updated to support new dungeons.</p>
         <p>Welcome to My Best Dungeon Teams. This site parses the output from the Run Logger plugin into tables
             that allow you to see stats about your farming teams such as: number of runs, avg time, and sucess rate. </p>
